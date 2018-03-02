@@ -30,11 +30,14 @@ public class StudentController {
 		return "add";
 	}
 	
-	@RequestMapping("/student/view")
-	public String view(Model model, @RequestParam(value="npm", required=true) String npm) {
-		StudentModel student = studentService.selectStudent(npm);
-		model.addAttribute("student", student);
-		return "view";
+	@RequestMapping("/student/view/")
+	public String view(Model model, @PathVariable Optional<String> npm) {
+		if(npm.isPresent()) {
+			StudentModel student = studentService.selectStudent(npm.get());
+			model.addAttribute("student", student);
+			return "view";
+		}
+		return "kosong";
 	}
 	
 	@RequestMapping("/student/view/{npm}")
@@ -57,9 +60,20 @@ public class StudentController {
 	}
 	
 	@RequestMapping("/student/delete/{npm}")
-	public String delete(@PathVariable String npm, Model model) {
-		StudentModel student = studentService.selectStudent(npm);
+	public String delete(@PathVariable Optional<String> npm, Model model) {
+		
+		StudentModel student = studentService.selectStudent(npm.get());
+		if(student == null) {
+			return "kosong";
+		}
 		studentService.removeStudent(student);
 		return "hapus";
 	}
+	
+	@RequestMapping("/student/delete")
+	public String delete(Model model) {
+		return "kosong";
+	}
+	
+	
 }
